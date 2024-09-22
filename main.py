@@ -1,10 +1,5 @@
-from typing import Union, Annotated
-from fastapi import FastAPI, HTTPException, Form, Query
+from app import App
 
-from models.Todo import Todo, Task
-from routes.main import route
+APP = App()
 
-app = FastAPI()
-
-app.include_router(route, prefix='/v1')
-
+app = APP.start()
