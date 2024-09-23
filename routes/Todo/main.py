@@ -1,7 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Form, HTTPException, Query, status
 
-from models.Todo import Todo, Task
+from models.Todo import Todo, Task, createTodo
+from core.todo import TodoController
 
 routes = APIRouter()
 
@@ -13,18 +14,16 @@ list_todos = [Todo(
    )]
 )]
 
+
 @routes.get('', status_code=status.HTTP_200_OK)
 def list_toDos():
    return list_todos
 
 @routes.post('', status_code=status.HTTP_201_CREATED)
-def create_todo(todo_name:Annotated[str, Form(), Query(min_length=3)]):
-   todo_new = Todo(
-      id=len(list_todos) + 1,
-      title=todo_name
-   )
-   list_todos.append(todo_new)
-   return todo_new
+def create_todo(new_todo: createTodo):   
+   todo = Todo.model_validate(new_todo)
+   toDo_result = TodoController().create_todo(todo)
+   return toDo_result
 
 @routes.get("/{todo_id}", status_code=status.HTTP_200_OK)
 def get_toDo(todo_id: int):
