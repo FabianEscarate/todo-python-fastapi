@@ -9,16 +9,16 @@ class Todo(TodoBase, table=True):
 
 class TodoWithTasks(TodoBase):
    id:int
-   tasks: list["taskPublic"] = []
+   tasks: list["Task"] = []
 
 class createTodo(TodoBase):
    pass
 
 class TaskBase(SQLModel):
   title: str
-  active: bool = Field(default=True)
-  complete: bool = Field(default=False)
-  todo_id:int  = Field(foreign_key="todo.id")
+  active: bool | None = Field(default=True)
+  complete: bool | None = Field(default=False)
+  todo_id:int | None  = Field(foreign_key="todo.id")
    
 class Task(TaskBase, table=True):
   id: int | None = Field(default=None, primary_key=True)
@@ -28,6 +28,5 @@ class taskPublic(TaskBase):
    id:int
 
 class createTask(TaskBase):
-   pass
-
-
+   title: str
+   todo_id: int | None = None
