@@ -24,23 +24,13 @@ def get_toDo(todo_id: int, session: Session = Depends(generate_session)):
       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ToDo not found")
    return todo
 
-@routes.get("/test/{todo_id}", status_code=status.HTTP_200_OK)
-def get_toDo(todo_id: int):
-   db_todo = TodoController().get_todo_by_id(todo_id)
-   if not db_todo:
-      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ToDo not found")
-   return db_todo
-
-
 @routes.put('/{id_todo}', status_code=status.HTTP_200_OK, response_model=Todo)
 def update_toDo(id_todo: int, update_todo: createTodo):
    db_todo = TodoController().get_todo_by_id(id_todo)
    if not db_todo:
       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ToDo not found")
-   
-   update_todo = update_todo.model_dump(exclude_unset=True)
-   db_todo.sqlmodel_update(update_todo)
-   updated_todo = TodoController().update_todo(db_todo)
+      
+   updated_todo = TodoController().update_todo(db_todo, update_todo)
    return updated_todo
 
 @routes.post('/{id_todo}', status_code=201, response_model=Task)
