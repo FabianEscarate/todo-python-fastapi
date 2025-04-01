@@ -1,0 +1,42 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+- feature-*
+- feature/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  IMAGE_NAME: 'mi-aplicacion'  # Nombre de la imagen
+  REGISTRY_NAME: 'miregistro.azurecr.io'  # Nombre del ACR
+  TAG: '$(Build.BuildId)'  # Usa el ID de compilación como tag
+
+stages:
+- stage: Build-Artifact
+  jobs:
+  - job: Build-Image
+    steps:
+      - task: Docker@2
+        inputs:
+          command: build
+          Dockerfile: '**/Dockerfile'
+          repository: '$(REGISTRY_NAME)/$(IMAGE_NAME)'
+          tags: 'latest,$(TAG)'  # Tag 'latest' y un tag con el Build ID
+        displayName: "🐳 Construir imagen Docker"
+      - script: |
+          docker save -o mi-imagen.tar $(REGISTRY_NAME)/$(IMAGE_NAME):$(TAG)
+        displayName: "📦 Guardar imagen en archivo"
+
+  - job: publish-image
+    steps:
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: 'mi-imagen.tar'
+        artifactName: 'docker-image'
+      displayName: "📤 Publicar imagen como artifact"
+
