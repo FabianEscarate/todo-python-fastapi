@@ -24,7 +24,7 @@ stages:
       - task: Docker@2
         inputs:
           command: build
-          Dockerfile: '**/Dockerfile'
+          Dockerfile: '**/Dockerfile.app'
           repository: '$(REGISTRY_NAME)/$(IMAGE_NAME)'
           tags: 'latest,$(TAG)'  # Tag 'latest' y un tag con el Build ID
         displayName: "🐳 Construir imagen Docker"
