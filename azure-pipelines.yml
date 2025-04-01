@@ -16,29 +16,22 @@ variables:
   REGISTRY_NAME: 'miregistro.azurecr.io'  # Nombre del ACR
   TAG: '$(Build.BuildId)'  # Usa el ID de compilación como tag
 
-stages:
-- stage: Build_Artifact
-  jobs:
-  - job: Build_Image
-    steps:
-      - task: Docker@2
-        inputs:
-          command: build
-          Dockerfile: '**/Dockerfile.app'
-          repository: '$(REGISTRY_NAME)/$(IMAGE_NAME)'
-          tags: 'latest,$(TAG)'  # Tag 'latest' y un tag con el Build ID
-        displayName: "🐳 Construir imagen Docker"
-      - script: |
-          docker save -o mi-imagen.tar $(REGISTRY_NAME)/$(IMAGE_NAME):$(TAG)
-        displayName: "📦 Guardar imagen en archivo"
+steps:
+- task: Docker@2
+  inputs:
+    command: build
+    Dockerfile: '**/Dockerfile.app'
+    repository: '$(REGISTRY_NAME)/$(IMAGE_NAME)'
+    tags: 'latest,$(TAG)'  # Tag 'latest' y un tag con el Build ID
+  displayName: "🐳 Construir imagen Docker"
 
-- stage: Publish_Artifact
-  jobs:
-  - job: publish_image
-    steps:
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: 'mi-imagen.tar'
-        artifactName: 'docker-image'
-      displayName: "📤 Publicar imagen como artifact"
+- script: |
+    docker save -o mi-imagen.tar $(REGISTRY_NAME)/$(IMAGE_NAME):$(TAG)
+  displayName: "📦 Guardar imagen en archivo"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: 'mi-imagen.tar'
+    artifactName: 'docker-image'
+  displayName: "📤 Publicar imagen como artifact"
 
